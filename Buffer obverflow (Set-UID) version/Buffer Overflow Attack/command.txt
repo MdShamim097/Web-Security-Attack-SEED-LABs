@@ -1,0 +1,59 @@
+sudo sysctl -w kernel.randomize_va_space=0
+sudo ln -sf /bin/zsh /bin/sh
+
+sudo su
+
+
+gcc -DBUF_SIZE=100 -m32 -o stack -z execstack -fno-stack-protector stack.c
+sudo chown root stack
+sudo chmod 4755 stack
+su seed
+
+
+touch badfile
+gcc -DBUF_SIZE=100 -m32 -o stack_dbg -g -z execstack -fno-stack-protector stack.c
+gdb stack_dbg
+
+b bof
+run
+next
+
+p $ebp
+p &buffer
+p /d 0xcf78 - 0xcf0c
+q
+
+python3 exploit.py
+./stack
+
+
+disas <function_name> 
+#prints the assembly dump along with address
+
+b <function_name>
+#set the breakpoint at the first instruction of the specified function
+
+b *0x<address>
+#set the breakpoint at the specified address
+
+run
+#program will pause execution at the breakpoint
+
+stepi
+#execute next instruction and pause
+
+continue
+#pause at next breakpoint
+
+p $RegisterName
+p &Variable
+#prints the address of the register/variable
+
+p (*(unsigned *)$RegisterName)
+p (*(unsigned *)&Variable)
+#prints the content of the register/variable
+
+q
+#quit from gdb
+
+
